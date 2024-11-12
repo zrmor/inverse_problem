@@ -411,6 +411,7 @@ def generate_data(gamma_variance_interval,
                   J_mean_interval, 
                   h_mean_interval,
                   Size,
+                  counter=0,
                   NumberOfSamples=10000,
                   beta=1):
     RMAE_df = []
@@ -419,7 +420,8 @@ def generate_data(gamma_variance_interval,
     TAP_Js = []
 
     NumberOfIterrations = Size**4
-    counter = 0
+    # counter = 0
+
     for mean_gamma in gamma_mean_interval:
         for variance_gamma in gamma_variance_interval:
             
