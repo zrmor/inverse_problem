@@ -80,6 +80,16 @@ class CNNClassifier(pl.LightningModule):
         self.log('val_acc', acc, on_epoch=True)
         return loss
     
+    def test_step(self, batch, batch_idx):
+        x, y = batch
+        logits = self(x)
+        loss = nn.CrossEntropyLoss()(logits, y)
+        acc = (logits.argmax(dim=1) == y).float().mean()
+        
+        self.log('test_loss', loss, on_epoch=True)
+        self.log('test_acc', acc, on_epoch=True)
+        return loss
+    
     def configure_optimizers(self):
         return torch.optim.Adam(self.parameters(), lr=self.hparams.learning_rate)
 
