@@ -8,7 +8,7 @@ import math
 import yfinance as yf
 import datetime
 import scipy
-
+import pickle
 
 def CorrolationMetrix(StartTime, EndTime, LogReturn_df):
   CorrMatrix = LogReturn_df[(LogReturn_df.index>=StartTime) & (LogReturn_df.index<=EndTime)].cov().to_numpy()
@@ -403,6 +403,106 @@ def RMAE(Original_J, Recontructed_J):
     np.fill_diagonal(Recontructed_J, 0)
     rmae = np.nansum(abs(Recontructed_J - Original_J))/np.sum(abs(Original_J))
     return rmae
+
+def generate_data_higher_order(gamma_var_min, gamma_var_max,
+                               gamma_mean_min, gamma_mean_max,
+                               size,
+                               counter=0,
+                               number_of_samples=10000,
+                               beta=1):
+    number_of_iter = size**4
+    mean_h, var_h = 0, 0
+    mean_J, var_J = 0, 0.5
+
+    for mean_gamma in np.linspace(gamma_mean_min, gamma_mean_max, 3):
+        for var_gamma in np.linspace(gamma_var_min, gamma_var_max, 3):
+            for _ in range(50):
+
+                with open(f"params_HO_{counter}.pkl", "wb") as file:
+                    pickle.dump(dict, file)
+                Gamma_init, J_init, h_init, C, M = Get_C_M_J_higher_order(number_of_iter, number_of_samples, size, mean_gamma, var_gamma**0.05, mean_J, var_J**0.5, mean_h, var_h**0.5, beta)
+                h_nMF, J_nMF = nMF_Reconstruction(C, M) 
+                h_TAP, J_TAP = TAP_Reconstruction(C, M) 
+
+                np.save(f'data/C_HO_{counter}.npy', C)
+                np.save(f'data/M_HO_{counter}.npy', M)
+                np.save(f'data/h_init_HO_{counter}.npy', h_init)
+                np.save(f'data/gamma_init_HO_{counter}.npy', Gamma_init)
+                np.save(f'data/J_TAP_HO_{counter}.npy', J_TAP)
+                np.save(f'data/J_nMF_HO_{counter}.npy', J_nMF)
+                np.save(f'data/J_init_HO_{counter}.npy', J_init)
+
+                print(counter)
+                counter += 1
+
+
+def generate_data_external_field(h_mean_min, h_mean_max,
+                                 h_var_min, h_var_max,
+                               size,
+                               counter=0,
+                               number_of_samples=10000,
+                               beta=1):
+    
+    number_of_iter = size**4
+    mean_gamma, var_gamma = 0, 0
+    var_J, mean_J = 0, 0.5
+
+    for mean_h in np.linspace(h_mean_min, h_mean_max, 3):
+        for var_h in np.linspace(h_var_min, h_var_max, 3):
+            for _ in range(50):
+
+                with open(f"params_EF_{counter}.pkl", "wb") as file:
+                    pickle.dump(dict, file)
+
+                Gamma_init, J_init, h_init, C, M = Get_C_M_J_higher_order(number_of_iter, number_of_samples, size, mean_gamma, var_gamma**0.05, mean_J, var_J**0.5, mean_h, var_h**0.5, beta)
+                h_nMF, J_nMF = nMF_Reconstruction(C, M) 
+                h_TAP, J_TAP = TAP_Reconstruction(C, M) 
+
+                np.save(f'data/C_EF_{counter}.npy', C)
+                np.save(f'data/M_EF_{counter}.npy', M)
+                np.save(f'data/h_init_EF_{counter}.npy', h_init)
+                np.save(f'data/gamma_init_EF_{counter}.npy', Gamma_init)
+                np.save(f'data/J_TAP_EF_{counter}.npy', J_TAP)
+                np.save(f'data/J_nMF_EF_{counter}.npy', J_nMF)
+                np.save(f'data/J_init_EF_{counter}.npy', J_init)
+
+                print(counter)
+                counter += 1
+
+
+def generate_data_higher_variance(min_var_J, max_var_J, 
+                               min_mean_J, max_mean_J,
+                               size,
+                               counter=0,
+                               number_of_samples=10000,
+                               beta=1):
+    
+    number_of_iter = size**4
+    mean_gamma, var_gamma = 0, 0
+    mean_h, var_h = 0, 0 
+
+    for mean_J in np.linspace(min_mean_J, max_mean_J, 3):
+        for var_J in np.linspace(min_var_J, max_var_J, 3):
+            for _ in range(50):
+
+                with open(f"params_EF_{counter}.pkl", "wb") as file:
+                    pickle.dump(dict, file)
+
+                Gamma_init, J_init, h_init, C, M = Get_C_M_J_higher_order(number_of_iter, number_of_samples, size, mean_gamma, var_gamma**0.05, mean_J, var_J**0.5, mean_h, var_h**0.5, beta)
+                h_nMF, J_nMF = nMF_Reconstruction(C, M) 
+                h_TAP, J_TAP = TAP_Reconstruction(C, M) 
+
+                np.save(f'data/C_EF_{counter}.npy', C)
+                np.save(f'data/M_EF_{counter}.npy', M)
+                np.save(f'data/h_init_EF_{counter}.npy', h_init)
+                np.save(f'data/gamma_init_EF_{counter}.npy', Gamma_init)
+                np.save(f'data/J_TAP_EF_{counter}.npy', J_TAP)
+                np.save(f'data/J_nMF_EF_{counter}.npy', J_nMF)
+                np.save(f'data/J_init_EF_{counter}.npy', J_init)
+
+                print(counter)
+                counter += 1
+
 
 def generate_data(gamma_variance_interval, 
                   J_variance_interval, 
