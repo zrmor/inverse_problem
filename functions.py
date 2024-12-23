@@ -485,7 +485,7 @@ def generate_data_higher_variance(min_var_J, max_var_J,
         for var_J in np.linspace(min_var_J, max_var_J, 3):
             for _ in range(50):
 
-                with open(f"params_EF_{counter}.pkl", "wb") as file:
+                with open(f"params_HV_{counter}.pkl", "wb") as file:
                     pickle.dump(dict, file)
 
                 Gamma_init, J_init, h_init, C, M = Get_C_M_J_higher_order(number_of_iter, number_of_samples, size, mean_gamma, var_gamma**0.05, mean_J, var_J**0.5, mean_h, var_h**0.5, beta)
