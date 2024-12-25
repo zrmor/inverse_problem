@@ -16,11 +16,16 @@ class MatrixDataset(Dataset):
         return self.matrices[idx], self.labels[idx]
 
 class CNNClassifier(pl.LightningModule):
-    def __init__(self, learning_rate=1e-3, conv_channels=[1, 16, 32, 64], 
-                 fc_units=[576, 128, 2], dropout_rate=0.5):
+    def __init__(self, learning_rate=None, conv_channels=None, 
+                 fc_units=None, dropout_rate=None):
         super().__init__()
         self.save_hyperparameters()
-        
+
+        self.learning_rate = learning_rate
+        self.conv_channels = conv_channels
+        self.fc_units = fc_units
+        self.dropout_rate = dropout_rate
+
         # Convolutional layers
         conv_layers = []
         for i in range(len(conv_channels)-1):
