@@ -97,6 +97,18 @@ class CNNClassifier(pl.LightningModule):
     
     def configure_optimizers(self):
         return torch.optim.Adam(self.parameters(), lr=self.hparams.learning_rate)
+    
+    def predict(self, dataloader):
+        """Predict labels for the given dataloader."""
+        self.eval()  # Set the model to evaluation mode
+        predictions = []
+        with torch.no_grad():
+            for batch in dataloader:
+                x, _ = batch  # Get the input data, ignore labels
+                logits = self(x)
+                preds = logits.argmax(dim=1)  # Get the predicted class
+                predictions.extend(preds.cpu().numpy())  # Store predictions
+        return predictions
 
 def get_feature_maps(model, sample_input):
     """Helper function to extract feature maps"""
